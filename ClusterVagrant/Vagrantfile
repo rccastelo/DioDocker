@@ -1,0 +1,34 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby  :
+
+machines = {
+  "nodehost" => {"memory" => "2048", "cpu" => "4", "ip" => "200", "image" => "bento/ubuntu-20.04"},
+  "node01" => {"memory" => "2048", "cpu" => "3", "ip" => "201", "image" => "bento/ubuntu-20.04"},
+  "node02" => {"memory" => "2048", "cpu" => "3", "ip" => "202", "image" => "bento/ubuntu-20.04"}
+}
+
+Vagrant.configure("2") do |config|
+
+  machines.each do |name, conf|
+    config.vm.define "#{name}" do |machine|
+      machine.vm.box = "#{conf["image"]}"
+      machine.vm.hostname = "#{name}.local"
+      machine.vm.network "private_network", ip: "10.20.0.#{conf["ip"]}"
+      machine.vm.provider "virtualbox" do |virtualbox|
+        virtualbox.name = "#{name}"
+        virtualbox.memory = conf["memory"]
+        virtualbox.cpus = conf["cpu"]
+        
+      end
+      machine.vm.provision "shell", path: "update.sh"
+      machine.vm.provision "shell", path: "docker.sh"
+      
+      if "#{name}" == "nodehost"
+        machine.vm.provision "shell", path: "master.sh"
+      else
+        machine.vm.provision "shell", path: "worker.sh"
+      end
+
+    end
+  end
+end

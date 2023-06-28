@@ -1,0 +1,9 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "hashicorp/bionic64"
+    config.vm.network "public_network"
+    config.vm.provider "virtualbox"
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+end
+
+
+smb_password: "mypass", smb_username: "myuser"
